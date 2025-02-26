@@ -1,7 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:study_flow/pages/settings_page/settings_page.dart';
-import 'package:study_flow/pages/subjects_page/subjects_page.dart';
+import 'package:study_flow/pages/viewing_mode_page/viewing_mode_page.dart';
 
 class HomePage extends StatelessWidget {
   @override
@@ -19,7 +19,7 @@ class HomePage extends StatelessWidget {
                 // Переход на страницу с лекциями
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => SubjectsPage()),
+                  MaterialPageRoute(builder: (context) => ViewingModePage()),
                 );
               },
               child: Text('Лекции'),
