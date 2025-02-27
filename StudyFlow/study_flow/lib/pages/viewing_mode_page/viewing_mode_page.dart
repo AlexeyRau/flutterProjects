@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/calendar)page/calendar_page.dart';
+import 'package:study_flow/pages/calendar_page/calendar_page.dart';
 import 'package:study_flow/pages/subjects_page/subjects_page.dart';
 
 class ViewingModePage extends StatelessWidget {
