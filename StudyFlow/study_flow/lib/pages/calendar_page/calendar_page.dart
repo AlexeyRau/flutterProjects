@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:study_flow/services/ics_parse.dart';
 
 class CalendarPage extends StatefulWidget {
   @override
@@ -48,7 +49,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   Widget _buildDateList() {
     return Container(
-      height: 120, // ← ФИКСИРОВАННАЯ ВЫСОТА ВСЕГО СПИСКА
+      height: 120, 
       child: ListView.builder(
         controller: _scrollController,
         scrollDirection: Axis.horizontal,
@@ -60,9 +61,29 @@ class _CalendarPageState extends State<CalendarPage> {
           final isToday = _isSameDate(startDate, DateTime.now());
 
           return GestureDetector(
-            onTap: () {
-              print('Выбрана дата: ${startDate.toLocal()}');
+            onTap: () async {
+              final date = startDate.toLocal();
+              print('Выбрана дата: ${date.toString().split(' ')[0].replaceAll('-', '.')}');
               setState(() => _selectedIndex = index);
+              try {
+                print('Начало загрузки данных...');
+                final events = await fetchAndParseICalendar(date);
+                print('====== Распарсенные события ======');
+                for (final event in events) {
+                  print('Событие: ${event['summary']}');
+                  print('Дата: ${event['dateStart']}');
+                  print('Время начала: ${event['timeStart']}');
+                  print('Время конца: ${event['timeEnd']}');
+                  print('Аудитория: ${event['location'] ?? 'Нет данных'}');
+                  print('Группа: ${event['group']}');
+                  print('Тип занятия: ${event['type']}');
+                  print('-------------------------------');
+                }
+                print('Всего событий: ${events.length}');
+              } catch (e) {
+                print('ОШИБКА: $e');
+              }
+              
             },
             child: Container(
               width: 100,
