@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/calendar_page/calendar_page.dart';
+import 'package:study_flow/pages/calendar_page/lines/dates_string.dart';
 import 'package:study_flow/pages/subjects_page/subjects_page.dart';
 
 class ViewingModePage extends StatelessWidget {
@@ -36,7 +36,7 @@ class ViewingModePage extends StatelessWidget {
                 // Переход на страницу с календарем
                 Navigator.push(
                   context,
-                  MaterialPageRoute(builder: (context) => CalendarPage()),
+                  MaterialPageRoute(builder: (context) => DatesString()),
                 );
               },
               child: Text('Календарь'),

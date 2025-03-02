@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/calendar_page/calendar_page.dart';
+import 'package:study_flow/pages/calendar_page/lines/dates_string.dart';
 import 'package:study_flow/pages/home_page/home_page.dart';
 
 void main() {
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: CalendarPage(),
+      home: DatesString(),
     );
   }
 }
