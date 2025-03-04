@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/calendar_page/lines/dates_string.dart';
 import 'package:study_flow/pages/home_page/home_page.dart';
 
 void main() {
@@ -7,6 +6,8 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -14,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: DatesString(),
+      home: HomePage(),
     );
   }
 }

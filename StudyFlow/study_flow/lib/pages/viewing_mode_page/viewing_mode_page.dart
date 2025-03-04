@@ -11,7 +11,6 @@ class ViewingModePage extends StatelessWidget {
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () {
-            // Возврат на предыдущий экран
             Navigator.pop(context);
           },
         ),
@@ -22,7 +21,6 @@ class ViewingModePage extends StatelessWidget {
           children: <Widget>[
             ElevatedButton(
               onPressed: () {
-                // Переход на страницу с предметами
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => SubjectsPage()),
@@ -33,7 +31,6 @@ class ViewingModePage extends StatelessWidget {
             SizedBox(height: 20), // Пространство между кнопками
             ElevatedButton(
               onPressed: () {
-                // Переход на страницу с календарем
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => DatesString()),
