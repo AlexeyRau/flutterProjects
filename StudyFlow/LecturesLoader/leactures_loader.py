@@ -1,119 +1,149 @@
-import requests
+import json
 import base64
-import os
 from datetime import datetime
-from tkinter import Tk, filedialog 
-from tkinter import messagebox 
+from tkinter import Tk, filedialog, messagebox, simpledialog
+from tkinter.ttk import Combobox
+from getpass import getpass
+import requests
 
-GITHUB_TOKEN = input("Введите ваш GitHub Token: ")
-print("Токен получен!")
+# Конфигурация
 REPO_OWNER = "AlexeyRau"
 REPO_NAME = "lectures_base"
-CSV_PATH = "lectures.csv"
+JSON_PATH = "lectures.json"
+SUBJECTS = ["ОАИП", "Математика", "Физика", "Программирование", "Другое"]
 
-def select_md_file():
-    """Открывает проводник для выбора .md файла"""
-    root = Tk()
-    root.withdraw()
-    root.attributes('-topmost', True)
-    
-    file_path = filedialog.askopenfilename(
-        title="Выберите файл лекции (.md)",
-        filetypes=[("Markdown files", "*.md"), ("All files", "*.*")]
-    )
-    return file_path if file_path else None
+class LectureApp:
+    def __init__(self):
+        self.root = Tk()
+        self.root.withdraw()
 
-def create_initial_csv():
-    """Создаёт CSV файл с заголовками"""
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{CSV_PATH}"
-    headers = {
-        "Authorization": f"token {GITHUB_TOKEN}",
-        "Accept": "application/vnd.github.v3+json"
-    }
-    
-    initial_content = "Дата,Название лекции,Содержание лекции\n"
-    encoded_content = base64.b64encode(initial_content.encode("utf-8")).decode("utf-8")
-    
-    data = {
-        "message": "Создание файла lectures.csv",
-        "content": encoded_content
-    }
-    
-    response = requests.put(url, headers=headers, json=data)
-    return response.status_code == 201
+    def select_md_file(self):
+        """Выбор файла через проводник"""
+        return filedialog.askopenfilename(
+            title="Выберите файл лекции",
+            filetypes=[("Markdown", "*.md"), ("Все файлы", "*.*")]
+        )
 
-def get_current_csv():
-    """Получает текущий CSV из GitHub"""
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{CSV_PATH}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
-    
-    response = requests.get(url, headers=headers)
-    if response.status_code == 200:
-        content = base64.b64decode(response.json()["content"]).decode("utf-8")
-        return content
-    return None
+    def select_subject(self):
+        """Диалог выбора предмета"""
+        dialog = Tk()
+        dialog.title("Выбор предмета")
+        dialog.geometry("300x100")
+        
+        label = simpledialog.Label(dialog, text="Выберите предмет:")
+        label.pack(pady=5)
+        
+        combo = Combobox(dialog, values=SUBJECTS, state="readonly")
+        combo.pack(pady=5)
+        combo.set(SUBJECTS[0])
+        
+        def confirm():
+            dialog.result = combo.get()
+            dialog.destroy()
+        
+        simpledialog.Button(dialog, text="OK", command=confirm).pack()
+        dialog.wait_window()
+        return getattr(dialog, 'result', None)
 
-def update_csv_on_github(new_content):
-    """Обновляет CSV на GitHub"""
-    url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{CSV_PATH}"
-    headers = {"Authorization": f"token {GITHUB_TOKEN}"}
+    def get_lecture_metadata(self):
+        """Ввод метаданных лекции"""
+        subject = self.select_subject()
+        if not subject:
+            return None
 
-    current_file = requests.get(url, headers=headers).json()
-    sha = current_file.get("sha", "")
-    
-    encoded_content = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
-    
-    data = {
-        "message": "Добавлена новая лекция",
-        "content": encoded_content,
-        "sha": sha
-    }
-    
-    response = requests.put(url, headers=headers, json=data)
-    return response.status_code == 200
+        date = simpledialog.askstring("Дата", "Дата лекции (ГГГГ-ММ-ДД):")
+        if not date:
+            return None
+        try:
+            datetime.strptime(date, "%Y-%m-%d")
+        except ValueError:
+            messagebox.showerror("Ошибка", "Некорректный формат даты!")
+            return None
 
-def add_lecture():
-    """Основная функция"""
-    print("\nДобавление новой лекции")
-    print("-" * 30)
-    
-    md_path = select_md_file()
-    if not md_path:
-        print("❌ Файл не выбран!")
-        return
-    
-    date = input("Дата лекции (ГГГГ-ММ-ДД): ").strip()
-    try:
-        datetime.strptime(date, "%Y-%m-%d")
-    except ValueError:
-        messagebox.showerror("Ошибка", "Неверный формат даты! Используйте ГГГГ-ММ-ДД.")
-        return
-    
-    name = input("Название лекции: ").strip()
-    if not name:
-        messagebox.showerror("Ошибка", "Название лекции не может быть пустым!")
-        return
-    
-    try:
-        with open(md_path, "r", encoding="utf-8") as f:
-            content = f.read().replace('"', '""')
-    except Exception as e:
-        messagebox.showerror("Ошибка", f"Не удалось прочитать файл:\n{e}")
-        return
-    
-    csv_content = get_current_csv()
-    if csv_content is None:
-        if not create_initial_csv():
-            messagebox.showerror("Ошибка", "Не удалось создать CSV файл!")
+        title = simpledialog.askstring("Название", "Название лекции:")
+        if not title:
+            return None
+
+        return {
+            "subject": subject,
+            "date": date,
+            "title": title
+        }
+
+    def upload_to_github(self, token, lectures):
+        """Загрузка данных на GitHub"""
+        url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{JSON_PATH}"
+        headers = {"Authorization": f"token {token}"}
+
+        # Получаем текущий SHA
+        response = requests.get(url, headers=headers)
+        sha = response.json().get("sha", "") if response.status_code == 200 else ""
+
+        data = {
+            "message": f"Добавлена лекция по {lectures[-1]['subject']}",
+            "content": base64.b64encode(
+                json.dumps(lectures, indent=2, ensure_ascii=False).encode()
+            ).decode(),
+            "sha": sha
+        }
+
+        response = requests.put(url, headers=headers, json=data)
+        return response.status_code in (200, 201)
+
+    def run(self):
+        """Основной цикл приложения"""
+        token = input("GitHub Token: ")
+        if not token:
             return
-        csv_content = "Дата,Название лекции,Содержание лекции\n"
-    
-    new_row = f'"{date}","{name}","{content}"\n'
-    
-    if update_csv_on_github(csv_content + new_row):
-        messagebox.showinfo("Успех", "✅ Лекция добавлена!")
-    else:
-        messagebox.showerror("Ошибка", "Не удалось обновить CSV на GitHub")
+
+        # Выбор файла
+        md_path = self.select_md_file()
+        if not md_path:
+            return
+
+        # Ввод метаданных
+        metadata = self.get_lecture_metadata()
+        if not metadata:
+            return
+
+        # Чтение содержимого
+        try:
+            with open(md_path, "r", encoding="utf-8") as f:
+                content = f.read()
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка чтения файла:\n{e}")
+            return
+
+        # Формирование лекции
+        new_lecture = {
+            "id": f"{metadata['subject'].lower()}-{datetime.now().timestamp()}",
+            **metadata,
+            "content": content,
+            "created_at": datetime.now().isoformat(),
+            "updated_at": datetime.now().isoformat()
+        }
+
+        # Загрузка существующих данных
+        try:
+            url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{JSON_PATH}"
+            response = requests.get(url, headers={"Authorization": f"token {token}"})
+            
+            if response.status_code == 200:
+                lectures = json.loads(base64.b64decode(response.json()["content"]))
+            else:
+                lectures = []
+        except Exception as e:
+            messagebox.showerror("Ошибка", f"Ошибка загрузки лекций:\n{e}")
+            return
+
+        # Добавление и сохранение
+        lectures.append(new_lecture)
+        
+        if self.upload_to_github(token, lectures):
+            messagebox.showinfo("Успех", "Лекция успешно добавлена!")
+        else:
+            messagebox.showerror("Ошибка", "Не удалось сохранить лекции")
 
 if __name__ == "__main__":
-    add_lecture()
+    app = LectureApp()
+    app.run()
