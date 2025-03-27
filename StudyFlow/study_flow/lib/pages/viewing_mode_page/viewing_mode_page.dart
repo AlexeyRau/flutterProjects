@@ -1,3 +1,4 @@
+// viewing_mode_page.dart
 import 'package:flutter/material.dart';
 import 'package:study_flow/pages/calendar_page/lines/dates_string.dart';
 import 'package:study_flow/pages/subjects_page/subjects_page.dart';
@@ -10,9 +11,7 @@ class ViewingModePage extends StatelessWidget {
         title: Text('Лекции'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () {
-            Navigator.pop(context);
-          },
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: Center(
@@ -28,7 +27,7 @@ class ViewingModePage extends StatelessWidget {
               },
               child: Text('Предметы'),
             ),
-            SizedBox(height: 20), // Пространство между кнопками
+            SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 Navigator.push(

@@ -1,30 +1,35 @@
-// subjects_page.dart
+// lectures_page.dart
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/lectures_page/lectures_page.dart';
+import 'package:study_flow/services/lecture_model.dart';
+import 'package:study_flow/pages/lecture_view_page/lecture_view_page.dart';
 import 'package:study_flow/services/lecture_service.dart';
 
-class SubjectsPage extends StatefulWidget {
+class LecturesPage extends StatefulWidget {
+  final String subject;
+
+  LecturesPage({required this.subject});
+
   @override
-  _SubjectsPageState createState() => _SubjectsPageState();
+  _LecturesPageState createState() => _LecturesPageState();
 }
 
-class _SubjectsPageState extends State<SubjectsPage> {
-  late Future<List<String>> _subjectsFuture;
+class _LecturesPageState extends State<LecturesPage> {
+  late Future<List<Lecture>> _lecturesFuture;
   bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    _subjectsFuture = _fetchSubjects();
+    _lecturesFuture = _fetchLectures();
   }
 
-  Future<List<String>> _fetchSubjects() async {
+  Future<List<Lecture>> _fetchLectures() async {
     setState(() => _isLoading = true);
     try {
-      final lectures = await LectureService.fetchLectures();
-      final subjects = lectures.map((lecture) => lecture.subject).toSet().toList();
-      subjects.sort();
-      return subjects;
+      final lectures = await LectureService.fetchLecturesBySubject(widget.subject);
+      // Сортируем по дате (новые сначала)
+      lectures.sort((a, b) => b.date.compareTo(a.date));
+      return lectures;
     } finally {
       setState(() => _isLoading = false);
     }
@@ -34,7 +39,7 @@ class _SubjectsPageState extends State<SubjectsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Предметы'),
+        title: Text(widget.subject),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
           onPressed: () => Navigator.pop(context),
@@ -42,26 +47,28 @@ class _SubjectsPageState extends State<SubjectsPage> {
       ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
-          : FutureBuilder<List<String>>(
-              future: _subjectsFuture,
+          : FutureBuilder<List<Lecture>>(
+              future: _lecturesFuture,
               builder: (context, snapshot) {
                 if (snapshot.hasError) {
-                  return Center(child: Text('Ошибка загрузки предметов'));
+                  return Center(child: Text('Ошибка загрузки лекций'));
                 }
                 if (!snapshot.hasData) {
                   return Center(child: CircularProgressIndicator());
                 }
-                final subjects = snapshot.data!;
+                final lectures = snapshot.data!;
                 return ListView.builder(
-                  itemCount: subjects.length,
+                  itemCount: lectures.length,
                   itemBuilder: (context, index) {
+                    final lecture = lectures[index];
                     return ListTile(
-                      title: Text(subjects[index]),
+                      title: Text(lecture.title),
+                      subtitle: Text(lecture.date),
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LecturesPage(subject: subjects[index]),
+                            builder: (context) => LectureViewPage(lecture: lecture),
                           ),
                         );
                       },
