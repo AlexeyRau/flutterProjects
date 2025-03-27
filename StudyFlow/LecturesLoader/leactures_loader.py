@@ -6,7 +6,6 @@ from tkinter import Tk, Listbox, Button, Label, messagebox, filedialog, simpledi
 from tkinter.ttk import Combobox
 import requests
 
-# Конфигурация
 REPO_OWNER = "AlexeyRau"
 REPO_NAME = "lectures_base"
 JSON_PATH = "lectures.json"
@@ -18,22 +17,18 @@ class LectureManager:
         self.root.title("Менеджер лекций")
         self.root.geometry("600x400")
         
-        # Токен GitHub
         self.token = None
         self.lectures = []
         
-        # GUI элементы
         self.setup_ui()
         self.load_token()
         self.refresh_lectures()
 
     def setup_ui(self):
         """Создание интерфейса"""
-        # Список лекций
         self.listbox = Listbox(self.root, width=80, height=15)
         self.listbox.pack(pady=10)
         
-        # Кнопки управления
         Button(self.root, text="Добавить лекцию", command=self.add_lecture).pack(side="left", padx=10)
         Button(self.root, text="Удалить лекцию", command=self.delete_lecture).pack(side="left", padx=10)
         Button(self.root, text="Обновить список", command=self.refresh_lectures).pack(side="left", padx=10)
@@ -78,20 +73,16 @@ class LectureManager:
             messagebox.showerror("Ошибка", "Токен не введен!")
             return
         
-        # Выбор файла
         filepath = filedialog.askopenfilename(filetypes=[("Markdown", "*.md")])
         if not filepath:
             return
         
-        # Извлечение названия из имени файла
         title = os.path.splitext(os.path.basename(filepath))[0]
         
-        # Выбор предмета
         subject = self.select_subject()
         if not subject:
             return
         
-        # Ввод даты
         date = simpledialog.askstring("Дата", "Дата лекции (ГГГГ-ММ-ДД):", parent=self.root)
         if not date:
             return
@@ -101,7 +92,6 @@ class LectureManager:
             messagebox.showerror("Ошибка", "Некорректный формат даты!")
             return
         
-        # Чтение содержимого
         try:
             with open(filepath, "r", encoding="utf-8") as f:
                 content = f.read()
@@ -109,7 +99,6 @@ class LectureManager:
             messagebox.showerror("Ошибка", f"Ошибка чтения файла: {e}")
             return
         
-        # Создание новой лекции
         new_lecture = {
             "id": f"{datetime.now().timestamp()}",
             "subject": subject,
@@ -119,7 +108,6 @@ class LectureManager:
             "created_at": datetime.now().isoformat()
         }
         
-        # Добавление и сохранение
         self.lectures.append(new_lecture)
         self.save_lectures()
         self.refresh_lectures()
@@ -171,11 +159,9 @@ class LectureManager:
         url = f"https://api.github.com/repos/{REPO_OWNER}/{REPO_NAME}/contents/{JSON_PATH}"
         headers = {"Authorization": f"token {self.token}"}
         
-        # Получение текущего SHA
         response = requests.get(url, headers=headers)
         sha = response.json().get("sha", "") if response.status_code == 200 else ""
         
-        # Подготовка данных
         data = {
             "message": "Обновление списка лекций",
             "content": base64.b64encode(
