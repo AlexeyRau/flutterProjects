@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:study_flow/pages/home_page/home_page.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:study_flow/presentation/home/home_page.dart';
 
-void main() {
-  runApp(MyApp());
+void main() async{
+await dotenv.load(fileName: ".env");  
+runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
