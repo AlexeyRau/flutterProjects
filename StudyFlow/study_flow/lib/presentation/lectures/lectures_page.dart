@@ -7,7 +7,13 @@ import 'package:study_flow/presentation/lectures/lecture_view_page.dart';
 
 class LecturesPage extends StatefulWidget {
   final String subject;
-  const LecturesPage({required this.subject, super.key});
+  final String? dateFilter;
+
+  const LecturesPage({
+    required this.subject,
+    this.dateFilter,
+    super.key,
+  });
 
   @override
   State<LecturesPage> createState() => _LecturesPageState();
@@ -24,7 +30,11 @@ class _LecturesPageState extends State<LecturesPage> {
 
   void _loadLectures() {
     setState(() {
-      _lecturesFuture = LectureService.fetchLecturesBySubject(widget.subject);
+      _lecturesFuture = widget.dateFilter != null 
+          ? LectureService.fetchLecturesBySubjectAndDate(
+              widget.subject, 
+              widget.dateFilter!)
+          : LectureService.fetchLecturesBySubject(widget.subject);
     });
   }
 

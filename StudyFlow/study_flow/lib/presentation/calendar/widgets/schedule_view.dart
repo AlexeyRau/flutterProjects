@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:study_flow/data/models/calendar_event.dart';
+import 'package:study_flow/presentation/lectures/lectures_page.dart';
 
 class ScheduleView extends StatelessWidget {
   final List<CalendarEvent> events;
@@ -17,12 +18,12 @@ class ScheduleView extends StatelessWidget {
       itemBuilder: (context, index) {
         final dateKey = sortedDates[index];
         final dateEvents = groupedEvents[dateKey]!;
-        return _buildDateSection(dateKey, dateEvents);
+        return _buildDateSection(dateKey, dateEvents, context);
       },
     );
   }
 
-  Widget _buildDateSection(String dateKey, List<CalendarEvent> events) {
+  Widget _buildDateSection(String dateKey, List<CalendarEvent> events, BuildContext context) {
     final date = DateTime.parse(dateKey);
     final weekday = DateFormat('EEEE').format(date);
     final formattedDate = '${_translateWeekday(weekday)}, '
@@ -43,29 +44,44 @@ class ScheduleView extends StatelessWidget {
             ),
           ),
         ),
-        ...events.map((event) => _buildEventCard(event)),
+        ...events.map((event) => _buildEventCard(event, context)),
       ],
     );
   }
 
-  Card _buildEventCard(CalendarEvent event) {
+  Widget _buildEventCard(CalendarEvent event, BuildContext context) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              '${event.summary}, ${event.timeStart} - ${event.timeEnd}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              '${event.location}, ${event.group}, ${event.type}',
-              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
-            ),
-          ],
+      child: InkWell(
+        onTap: () => _openLecturesForEvent(context, event),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${event.summary}, ${event.timeStart} - ${event.timeEnd}',
+                style: const TextStyle(fontSize: 16),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                '${event.location}, ${event.group}, ${event.type}',
+                style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openLecturesForEvent(BuildContext context, CalendarEvent event) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => LecturesPage(
+          subject: event.summary,
+          dateFilter: event.dateStart,
         ),
       ),
     );
