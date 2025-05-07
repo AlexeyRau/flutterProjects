@@ -1,5 +1,6 @@
 import 'package:http/http.dart' as http;
 import 'package:icalendar_parser/icalendar_parser.dart';
+import 'package:study_flow/data/services/settings_service.dart';
 import '../models/calendar_event.dart';
 import '../../core/utils/description_parser.dart';
 import '../../core/utils/date_utils.dart';
@@ -7,14 +8,16 @@ import '../../core/utils/date_utils.dart';
 class IcsService {
   static Future<List<CalendarEvent>> fetchEvents(DateTime date) async {
     try {
+      final groupCode = await SettingsService.getSelectedGroupCode() ?? '850';
       final selectedDate = date.toString().split(' ')[0].replaceAll('-', '.');
       final firstSelectedDate = date
           .add(const Duration(days: 5))
           .toString()
           .split(' ')[0]
           .replaceAll('-', '.');
+
       final url = Uri.parse(
-        'https://rasp.omgtu.ru/api/schedule/group/850.ics?start=$selectedDate&finish=$firstSelectedDate&lng=1',
+        'https://rasp.omgtu.ru/api/schedule/group/$groupCode.ics?start=$selectedDate&finish=$firstSelectedDate&lng=1',
       );
 
       final response = await http.get(url);
