@@ -9,9 +9,6 @@ class ApiConstants {
     return token;
   }
 
-  static const String lecturesUrl = 
-    'https://api.github.com/repos/AlexeyRau/lectures_base/contents/lectures.json';
-  
-  static const String icsBaseUrl = 
-    'https://rasp.omgtu.ru/api/schedule/group/850.ics';
+  static const String lecturesUrl =
+      'https://api.github.com/repos/AlexeyRau/lectures_base/contents/lectures.json';
 }

@@ -6,8 +6,6 @@ class CalendarPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: DatesString(),
-    );
+    return const Scaffold(body: DatesString());
   }
 }

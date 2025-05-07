@@ -6,11 +6,11 @@ class CustomAppBar extends AppBar {
     required BuildContext context,
     List<Widget>? actions,
   }) : super(
-    title: Text(title),
-    leading: IconButton(
-      icon: const Icon(Icons.arrow_back),
-      onPressed: () => Navigator.pop(context),
-    ),
-    actions: actions,
-  );
+         title: Text(title),
+         leading: IconButton(
+           icon: const Icon(Icons.arrow_back),
+           onPressed: () => Navigator.pop(context),
+         ),
+         actions: actions,
+       );
 }

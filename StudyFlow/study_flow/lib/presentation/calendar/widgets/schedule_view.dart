@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:study_flow/core/utils/weekday_translator.dart';
 import 'package:study_flow/data/models/calendar_event.dart';
 import 'package:study_flow/presentation/lectures/lectures_page.dart';
 
@@ -23,12 +24,17 @@ class ScheduleView extends StatelessWidget {
     );
   }
 
-  Widget _buildDateSection(String dateKey, List<CalendarEvent> events, BuildContext context) {
+  Widget _buildDateSection(
+    String dateKey,
+    List<CalendarEvent> events,
+    BuildContext context,
+  ) {
     final date = DateTime.parse(dateKey);
     final weekday = DateFormat('EEEE').format(date);
-    final formattedDate = '${_translateWeekday(weekday)}, '
-      '${date.day.toString().padLeft(2, '0')}.'
-      '${date.month.toString().padLeft(2, '0')}.${date.year}';
+    final formattedDate =
+        '${WeekdayTranslator.translate(weekday)},'
+        '${date.day.toString().padLeft(2, '0')}.'
+        '${date.month.toString().padLeft(2, '0')}.${date.year}';
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -79,10 +85,11 @@ class ScheduleView extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => LecturesPage(
-          subject: event.summary,
-          dateFilter: event.dateStart,
-        ),
+        builder:
+            (context) => LecturesPage(
+              subject: event.summary,
+              dateFilter: event.dateStart,
+            ),
       ),
     );
   }
@@ -94,17 +101,5 @@ class ScheduleView extends StatelessWidget {
       groupedEvents.putIfAbsent(dateKey, () => []).add(event);
     }
     return groupedEvents;
-  }
-
-  String _translateWeekday(String englishWeekday) {
-    const translations = {
-      'Monday': 'Понедельник',
-      'Tuesday': 'Вторник',
-      'Wednesday': 'Среда',
-      'Thursday': 'Четверг',
-      'Friday': 'Пятница',
-      'Saturday': 'Суббота',
-    };
-    return translations[englishWeekday] ?? englishWeekday;
   }
 }

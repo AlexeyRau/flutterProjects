@@ -30,13 +30,12 @@ class LectureService {
   }
 
   static Future<List<Lecture>> fetchLecturesBySubjectAndDate(
-    String subject, 
-    String date
+    String subject,
+    String date,
   ) async {
     final lectures = await fetchLectures();
-    return lectures.where((l) => 
-      l.subject == subject && 
-      l.date == date
-    ).toList();
+    return lectures
+        .where((l) => l.subject == subject && l.date == date)
+        .toList();
   }
 }

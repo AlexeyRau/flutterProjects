@@ -13,17 +13,9 @@ class ViewingModePage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            _buildNavigationButton(
-              context,
-              'Предметы',
-              const SubjectsPage(),
-            ),
+            _buildNavigationButton(context, 'Предметы', const SubjectsPage()),
             const SizedBox(height: 20),
-            _buildNavigationButton(
-              context,
-              'Календарь',
-              const CalendarPage(),
-            ),
+            _buildNavigationButton(context, 'Календарь', const CalendarPage()),
           ],
         ),
       ),
@@ -38,10 +30,11 @@ class ViewingModePage extends StatelessWidget {
     return SizedBox(
       width: 200,
       child: ElevatedButton(
-        onPressed: () => Navigator.push(
-          context,
-          MaterialPageRoute(builder: (_) => page),
-        ),
+        onPressed:
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => page),
+            ),
         child: Text(text),
       ),
     );

@@ -9,11 +9,7 @@ class LecturesPage extends StatefulWidget {
   final String subject;
   final String? dateFilter;
 
-  const LecturesPage({
-    required this.subject,
-    this.dateFilter,
-    super.key,
-  });
+  const LecturesPage({required this.subject, this.dateFilter, super.key});
 
   @override
   State<LecturesPage> createState() => _LecturesPageState();
@@ -30,11 +26,13 @@ class _LecturesPageState extends State<LecturesPage> {
 
   void _loadLectures() {
     setState(() {
-      _lecturesFuture = widget.dateFilter != null 
-          ? LectureService.fetchLecturesBySubjectAndDate(
-              widget.subject, 
-              widget.dateFilter!)
-          : LectureService.fetchLecturesBySubject(widget.subject);
+      _lecturesFuture =
+          widget.dateFilter != null
+              ? LectureService.fetchLecturesBySubjectAndDate(
+                widget.subject,
+                widget.dateFilter!,
+              )
+              : LectureService.fetchLecturesBySubject(widget.subject);
     });
   }
 

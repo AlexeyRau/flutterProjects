@@ -45,12 +45,14 @@ class _SubjectsPageState extends State<SubjectsPage> {
             itemBuilder: (context, index) {
               return ListTile(
                 title: Text(subjects[index]),
-                onTap: () => Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => LecturesPage(subject: subjects[index]),
-                  ),
-                ),
+                onTap:
+                    () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder:
+                            (context) => LecturesPage(subject: subjects[index]),
+                      ),
+                    ),
               );
             },
           );
