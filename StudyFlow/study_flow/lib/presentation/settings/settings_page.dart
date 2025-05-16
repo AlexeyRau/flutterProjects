@@ -22,10 +22,13 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadSelectedGroup() async {
     final code = await SettingsService.getSelectedGroupCode();
     if (code != null) {
-      final name = GroupData.groups.entries
-          .firstWhere((entry) => entry.value == code,
-              orElse: () => const MapEntry('ФИТ-231', '850'))
-          .key;
+      final name =
+          GroupData.groups.entries
+              .firstWhere(
+                (entry) => entry.value == code,
+                orElse: () => const MapEntry('ФИТ-231', '850'),
+              )
+              .key;
       setState(() {
         _selectedGroupName = name;
       });
@@ -35,9 +38,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _selectGroup(BuildContext context) async {
     final selectedName = await showDialog<String>(
       context: context,
-      builder: (context) => _GroupSelectDialog(
-        currentSelection: _selectedGroupName,
-      ),
+      builder:
+          (context) => _GroupSelectDialog(currentSelection: _selectedGroupName),
     );
     if (selectedName != null && selectedName.isNotEmpty) {
       final code = GroupData.groups[selectedName];
@@ -109,9 +111,10 @@ class _GroupSelectDialogState extends State<_GroupSelectDialog> {
   void _filterGroups() {
     final query = _searchController.text.toLowerCase();
     setState(() {
-      _filteredGroups = GroupData.groups.keys
-          .where((name) => name.toLowerCase().contains(query))
-          .toList();
+      _filteredGroups =
+          GroupData.groups.keys
+              .where((name) => name.toLowerCase().contains(query))
+              .toList();
     });
   }
 
